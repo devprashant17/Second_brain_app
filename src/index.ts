@@ -93,8 +93,40 @@ app.post("/api/v1/content",userMiddleware,async (req,res)=>{
     }
 });
 
-app.delete("/api/v1/delete",(req,res)=>{
+app.get("/api/v1/content",userMiddleware,async (req,res)=>{
+    //@ts-ignore
+    console.log(req.userId);
+    //@ts-ignore
+    const userId = req.userId;
+    try{
+        const content = await ContentModel.find({
+        userId: userId
+    }).populate("userId","username")
+        res.json({
+            content
+        })
+    }
+    catch(e){
+        res.json({
+            message:"Some error"
+        })
+    }
+})
 
+app.delete("/api/v1/delete",userMiddleware,async (req,res)=>{
+    const contentId = req.body.contentId;
+
+    console.log(contentId)
+    //@ts-ignore
+    const result = await ContentModel.deleteOne({
+        _id: contentId,
+        //@ts-ignore
+        userId: req.userId
+    })
+
+    res.json({
+        message:"Deleted content!"
+    })
 });
 
 app.get("/api/v1/brain/:shareLink",(req,res)=>{
